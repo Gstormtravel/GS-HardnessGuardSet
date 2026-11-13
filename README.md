@@ -1,3 +1,24 @@
+<div align="center">
+
+<img src="assets/banner.jpg" alt="GS-HardnessGuardSet Banner" width="100%" />
+
+<br/>
+
+<img src="assets/icon.jpg" alt="GS-HardnessGuardSet Icon" width="128" />
+
+# GS-HardnessGuardSet
+
+**Controle granular de dureza e velocidade de quebra de qualquer bloco do Minecraft por tipo de geração.**
+
+[![Versão](https://img.shields.io/badge/Versão-2.0.0-7C3AED?style=for-the-badge)](https://github.com/Gstormtravel/GS-HardnessGuardSet/releases/tag/v2.0.0)
+[![Paper / Purpur](https://img.shields.io/badge/Paper%20%2F%20Purpur-1.21%2B%20%7C%2026.3-10B981?style=for-the-badge)](https://papermc.io/)
+[![Java](https://img.shields.io/badge/Java-21%2B-EA580C?style=for-the-badge)](https://adoptium.net/)
+[![Reddit](https://img.shields.io/badge/Reddit-r%2FGSHardnessGuardSet-FF4500?style=for-the-badge)](https://www.reddit.com/r/GSHardnessGuardSet/)
+
+</div>
+
+---
+
 # Wiki — **GS-HardnessGuardSet**
 
 Plugin leve para **Paper / Purpur `1.21+` (incluindo `26.3`)** que permite configurar a resistência (velocidade de quebra) de **qualquer bloco do Minecraft** via `config.yml` ou diretamente pelo chat do jogo, filtrando por **origem/tipo de geração do bloco** sem impactar o TPS do servidor.
@@ -16,7 +37,7 @@ Plugin leve para **Paper / Purpur `1.21+` (incluindo `26.3`)** que permite confi
 
 1. Pare o servidor.
 2. Coloque `GS-HardnessGuardSet-2.0.0.jar` na pasta `plugins/` e inicie o servidor para gerar `plugins/GS-HardnessGuardSet/config.yml`.
-3. Edite o `config.yml` ou configure diretamente no chat com `/hardnessguard setblock ...` e aplique quando desejar com `/hardnessguard reload`.
+3. Edite o `config.yml` ou configure diretamente no chat com `/hardnessguard setrule ...` e aplique quando desejar com `/hardnessguard reload`.
 
 ---
 
