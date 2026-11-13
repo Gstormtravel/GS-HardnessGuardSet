@@ -10,7 +10,8 @@
 
 **Controle granular de dureza e velocidade de quebra de qualquer bloco do Minecraft por tipo de geração.**
 
-[![Versão](https://img.shields.io/badge/Versão-2.0.0-7C3AED?style=for-the-badge)](https://github.com/Gstormtravel/GS-HardnessGuardSet/releases/tag/v2.0.0)
+[![Versão](https://img.shields.io/badge/Versão-2.0.1-7C3AED?style=for-the-badge)](https://github.com/Gstormtravel/GS-HardnessGuardSet/releases/tag/v2.0.1)
+[![Modrinth](https://img.shields.io/badge/Modrinth-gs--hardnessguardset-1BD96A?style=for-the-badge&logo=modrinth)](https://modrinth.com/project/gs-hardnessguardset)
 [![Paper / Purpur](https://img.shields.io/badge/Paper%20%2F%20Purpur-1.21%2B%20%7C%2026.3-10B981?style=for-the-badge)](https://papermc.io/)
 [![Java](https://img.shields.io/badge/Java-21%2B-EA580C?style=for-the-badge)](https://adoptium.net/)
 [![Reddit](https://img.shields.io/badge/Reddit-r%2FGSHardnessGuardSet-FF4500?style=for-the-badge)](https://www.reddit.com/r/GSHardnessGuardSet/)
@@ -91,6 +92,11 @@ settings:
   actionbar-cooldown-ms: 5000
   track-pistons: true
   debug: false
+  update-checker:
+    enabled: true
+    auto-download: false
+    notify-on-join: true
+    project-id: "Lqgp0tpP"
 
 blocks:
   NOME_DO_MATERIAL_MINECRAFT:
@@ -109,6 +115,10 @@ blocks:
 * `actionbar-cooldown-ms`: Intervalo mínimo (em milissegundos) entre envios da ActionBar para o mesmo jogador.
 * `track-pistons`: Mantém o rastreamento de `LAVA_GENERATOR_GEN` e `PLAYER_PLACED` quando blocos são movidos por pistão.
 * `debug`: Ativa logs detalhados no console para verificação de eventos.
+* `update-checker.enabled`: Consulta a API v2 do Modrinth no boot e a cada 12 horas por novas versões.
+* `update-checker.auto-download`: Quando `true`, baixa automaticamente novos `.jar` validados por SHA-512 para `plugins/update/` (aplicados no próximo restart).
+* `update-checker.notify-on-join`: Notifica jogadores com `hardnessguard.admin` ao entrar quando houver atualização.
+* `update-checker.project-id`: ID/slug do projeto no Modrinth (padrão: `Lqgp0tpP`).
 
 ### Campos em `blocks.<MATERIAL>:`
 * `<MATERIAL>`: Nome oficial do `Material` no Paper/Bukkit (ex.: `OBSIDIAN`, `CRYING_OBSIDIAN`, `DEEPSLATE`, `ANCIENT_DEBRIS`, `COBBLESTONE`, `BASALT`, `NETHERRACK`).
@@ -175,6 +185,7 @@ blocks:
 | `/hardnessguard setrule <BLOCO> <SPEED-MODIFIER> <GENERATIONS> [true/false] [actionbar true/false] <ACTIONBAR_MESSAGE>` | `setblock` | Cria ou altera diretamente uma regra no `config.yml` pelo chat, incluindo estado ativo, aviso na ActionBar e mensagem customizada (`<GENERATIONS>` separadas por vírgula). | `hardnessguard.admin` |
 | `/hardnessguard removerule <BLOCO>` | `removeblock` | Remove a regra de um bloco do `config.yml` restaurando o comportamento padrão vanilla. | `hardnessguard.admin` |
 | `/hardnessguard reload` | — | Recarrega o `config.yml` e atualiza as regras em memória sem reiniciar o servidor. | `hardnessguard.admin` |
+| `/hardnessguard update [check\|download]` | — | Verifica atualizações no Modrinth (`Lqgp0tpP`) e baixa o `.jar` validado por SHA-512 para `plugins/update/`. | `hardnessguard.admin` |
 
 ### Exemplos de uso via chat
 * `/hardnessguard setrule OBSIDIAN -0.95 NATURAL_GEN,LAVA-GENERATOR_GEN,PLAYER_PLACED true true &c⛏ Obsidiana protegida!`
@@ -185,3 +196,9 @@ blocks:
 ### Permissões
 * **`hardnessguard.admin`** *(padrão: `op`)*: Acesso completo aos comandos administrativos.
 * **`hardnessguard.bypass`** *(padrão: `false`)*: Ignora modificadores quando `settings.use-bypass-permission: true`.
+
+---
+
+## 8. Auto-Publicação no Modrinth via GitHub Actions (PAT)
+
+Este repositório inclui o workflow [`.github/workflows/modrinth-publish.yml`](.github/workflows/modrinth-publish.yml). Sempre que uma nova **Release** for publicada no GitHub com o `.jar` compilado em anexo, o GitHub Actions envia automaticamente a nova versão para o Modrinth usando o secret `MODRINTH_TOKEN` (**Personal Access Token / PAT** criado em `https://modrinth.com/settings/pats` e cadastrado em *Repository Settings → Secrets and variables → Actions*).

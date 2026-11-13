@@ -36,6 +36,12 @@ settings:
   track-pistons: true
   # Logs detalhados no console para diagnostico
   debug: false
+  # Integracao com a API do Modrinth para checagem e download seguro (plugins/update/)
+  update-checker:
+    enabled: true
+    auto-download: false
+    notify-on-join: true
+    project-id: "Lqgp0tpP"
 
 blocks:
   OBSIDIAN:

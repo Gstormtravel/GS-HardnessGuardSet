@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 public final class HardnessGuardCommand implements TabExecutor {
 
     private static final List<String> SUBCOMMANDS = List.of(
-            "status", "check", "list", "setrule", "setblock", "removerule", "removeblock", "reload");
+            "status", "check", "list", "setrule", "setblock", "removerule", "removeblock", "reload", "update");
     private static final List<String> GEN_SUGGESTIONS = List.of(
             "NATURAL_GEN",
             "KGEN_GEN",
@@ -47,6 +47,7 @@ public final class HardnessGuardCommand implements TabExecutor {
             case "list" -> handleList(sender);
             case "setrule", "setblock" -> handleSetRule(sender, label, args, sub);
             case "removerule", "removeblock" -> handleRemoveRule(sender, label, args, sub);
+            case "update" -> handleUpdate(sender, args);
             default -> handleStatus(sender);
         };
     }
@@ -66,6 +67,19 @@ public final class HardnessGuardCommand implements TabExecutor {
         sender.sendMessage(plugin.color(
                 "&a[HardnessGuardSet] Configuracao recarregada! Regras ativas: &e"
                         + plugin.getActiveRuleCount() + "&a."));
+        return true;
+    }
+
+    private boolean handleUpdate(CommandSender sender, String[] args) {
+        ModrinthUpdater updater = plugin.getUpdater();
+        if (updater == null) {
+            sender.sendMessage(plugin.color("&c[HardnessGuardSet] Updater nao inicializado."));
+            return true;
+        }
+        boolean checkOnly = args.length >= 2 && "check".equalsIgnoreCase(args[1]);
+        sender.sendMessage(plugin.color("&7[HardnessGuardSet] Consultando Modrinth (&f"
+                + plugin.getModrinthProjectId() + "&7)..."));
+        updater.checkAsync(sender, false, !checkOnly);
         return true;
     }
 
@@ -265,6 +279,9 @@ public final class HardnessGuardCommand implements TabExecutor {
             return filterPrefix(SUBCOMMANDS, args[0]);
         }
         String sub = args[0].toLowerCase(Locale.ROOT);
+        if (sub.equals("update") && args.length == 2) {
+            return filterPrefix(List.of("check", "download"), args[1]);
+        }
         if ((sub.equals("removeblock") || sub.equals("removerule")) && args.length == 2) {
             List<String> configured = plugin.getAllRules().keySet().stream().map(Material::name).toList();
             return filterPrefix(configured, args[1]);

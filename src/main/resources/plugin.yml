@@ -1,5 +1,5 @@
 name: GS-HardnessGuardSet
-version: 2.0.0
+version: 2.0.1
 main: br.com.survivalzao.hardnessguard.HardnessGuardPlugin
 api-version: '1.21'
 softdepend: [KGenerators]
@@ -8,7 +8,7 @@ commands:
   hardnessguard:
     description: Gerencia regras de dureza de blocos e diagnostico do GS-HardnessGuardSet
     aliases: [hguard, gsguard, obsidianguard]
-    usage: /hardnessguard <status|check|list|setrule|removerule|setblock|removeblock|reload>
+    usage: /hardnessguard <status|check|list|setrule|removerule|setblock|removeblock|reload|update>
     permission: hardnessguard.admin
 permissions:
   hardnessguard.admin:

@@ -1,0 +1,60 @@
+name: Publish to Modrinth
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  modrinth:
+    name: Upload Release JAR to Modrinth
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload attached release JAR to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          PROJECT_ID: Lqgp0tpP
+        run: |
+          if [ -z "$MODRINTH_TOKEN" ]; then
+            echo "::notice::Secret MODRINTH_TOKEN (Modrinth PAT) nao configurada em Settings -> Secrets -> Actions. Upload automatico ignorado ate o token ser adicionado."
+            exit 0
+          fi
+
+          ASSET_URL=$(jq -r '.release.assets[] | select(.name | endswith(".jar")) | .browser_download_url' "$GITHUB_EVENT_PATH" | head -n 1)
+          ASSET_NAME=$(jq -r '.release.assets[] | select(.name | endswith(".jar")) | .name' "$GITHUB_EVENT_PATH" | head -n 1)
+
+          if [ -z "$ASSET_URL" ] || [ "$ASSET_URL" = "null" ]; then
+            echo "Nenhum arquivo .jar anexado a esta Release do GitHub."
+            exit 1
+          fi
+
+          curl -fsSL "$ASSET_URL" -o "$ASSET_NAME"
+          VERSION_NUM="${RELEASE_TAG#v}"
+
+          DATA=$(jq -n \
+            --arg name "${RELEASE_NAME:-$RELEASE_TAG}" \
+            --arg version "$VERSION_NUM" \
+            --arg changelog "${RELEASE_BODY:-Release $RELEASE_TAG}" \
+            --arg project "$PROJECT_ID" \
+            --arg filename "$ASSET_NAME" \
+            '{
+              name: $name,
+              version_number: $version,
+              changelog: $changelog,
+              dependencies: [],
+              game_versions: ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"],
+              version_type: "release",
+              loaders: ["paper", "purpur"],
+              featured: true,
+              status: "listed",
+              project_id: $project,
+              file_parts: ["file"],
+              primary_file: "file"
+            }')
+
+          curl -fsS -X POST "https://api.modrinth.com/v2/version" \
+            -H "Authorization: $MODRINTH_TOKEN" \
+            -F "data=$DATA" \
+            -F "file=@$ASSET_NAME"

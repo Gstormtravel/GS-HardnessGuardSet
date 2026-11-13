@@ -72,6 +72,11 @@ public final class HardnessGuardPlugin extends JavaPlugin {
     private boolean trackPistons;
     private boolean debug;
     private boolean kgeneratorsEnabled;
+    private boolean updateCheckerEnabled;
+    private boolean updateAutoDownload;
+    private boolean updateNotifyOnJoin;
+    private String modrinthProjectId = ModrinthUpdater.DEFAULT_PROJECT_ID;
+    private ModrinthUpdater updater;
 
     @Override
     public void onEnable() {
@@ -79,11 +84,13 @@ public final class HardnessGuardPlugin extends JavaPlugin {
         this.modifierKey = new NamespacedKey(this, "block_hardness_mod");
         this.originTracker = new BlockOriginTracker(this);
         this.kgeneratorsEnabled = Bukkit.getPluginManager().isPluginEnabled("KGenerators");
+        this.updater = new ModrinthUpdater(this);
 
         loadSettings();
 
         Bukkit.getPluginManager().registerEvents(originTracker, this);
         Bukkit.getPluginManager().registerEvents(new HardnessListener(this), this);
+        Bukkit.getPluginManager().registerEvents(updater, this);
 
         PluginCommand cmd = getCommand("hardnessguard");
         if (cmd != null) {
@@ -92,9 +99,17 @@ public final class HardnessGuardPlugin extends JavaPlugin {
             cmd.setTabCompleter(executor);
         }
 
+        if (updateCheckerEnabled) {
+            updater.checkAsync(null, true, false);
+            long intervalTicks = 20L * 60L * 60L * 12L;
+            Bukkit.getScheduler().runTaskTimerAsynchronously(
+                    this, () -> updater.checkAsync(null, true, false), intervalTicks, intervalTicks);
+        }
+
         getLogger().info("GS-HardnessGuardSet v" + getDescription().getVersion()
                 + " habilitado! Regras ativas: " + getActiveRuleCount()
-                + " | KGenerators=" + kgeneratorsEnabled);
+                + " | KGenerators=" + kgeneratorsEnabled
+                + " | ModrinthUpdater=" + updateCheckerEnabled);
     }
 
     @Override
@@ -132,6 +147,13 @@ public final class HardnessGuardPlugin extends JavaPlugin {
         this.actionbarCooldownMs = Math.max(0L, getConfig().getLong("settings.actionbar-cooldown-ms", 5000L));
         this.trackPistons = getConfig().getBoolean("settings.track-pistons", true);
         this.debug = getConfig().getBoolean("settings.debug", false);
+        this.updateCheckerEnabled = getConfig().getBoolean("settings.update-checker.enabled", true);
+        this.updateAutoDownload = getConfig().getBoolean("settings.update-checker.auto-download", false);
+        this.updateNotifyOnJoin = getConfig().getBoolean("settings.update-checker.notify-on-join", true);
+        String configuredProjectId = getConfig().getString("settings.update-checker.project-id", ModrinthUpdater.DEFAULT_PROJECT_ID);
+        this.modrinthProjectId = (configuredProjectId == null || configuredProjectId.isBlank())
+                ? ModrinthUpdater.DEFAULT_PROJECT_ID
+                : configuredProjectId.trim();
 
         rules.clear();
         ConfigurationSection blocksSec = getConfig().getConfigurationSection("blocks");
@@ -264,6 +286,26 @@ public final class HardnessGuardPlugin extends JavaPlugin {
 
     public boolean isKGeneratorsEnabled() {
         return kgeneratorsEnabled;
+    }
+
+    public boolean isUpdateCheckerEnabled() {
+        return updateCheckerEnabled;
+    }
+
+    public boolean isUpdateAutoDownload() {
+        return updateAutoDownload;
+    }
+
+    public boolean isUpdateNotifyOnJoin() {
+        return updateNotifyOnJoin;
+    }
+
+    public String getModrinthProjectId() {
+        return modrinthProjectId;
+    }
+
+    public ModrinthUpdater getUpdater() {
+        return updater;
     }
 
     /**
