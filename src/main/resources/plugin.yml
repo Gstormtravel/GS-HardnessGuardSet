@@ -1,15 +1,19 @@
-name: SurvivalzaoObsidianGuard
-version: 1.0.0
-main: br.com.survivalzao.obsidianguard.ObsidianGuardPlugin
+name: GS-HardnessGuardSet
+version: 2.0.0
+main: br.com.survivalzao.hardnessguard.HardnessGuardPlugin
 api-version: '1.21'
 softdepend: [KGenerators]
-description: Torna obsidiana natural ou de geradores de redstone 95% mais dificil de quebrar mantendo geradores do KGenerators normais.
+description: Configura dureza e velocidade de quebra de qualquer bloco do Minecraft por tipo de geracao (NATURAL_GEN, KGEN_GEN, LAVA_GENERATOR_GEN, PLAYER_PLACED, ALL).
 commands:
-  obsidianguard:
-    description: Gerencia e verifica a protecao de obsidiana natural e de redstone
-    usage: /obsidianguard <status|check|reload>
-    permission: obsidianguard.admin
+  hardnessguard:
+    description: Gerencia regras de dureza de blocos e diagnostico do GS-HardnessGuardSet
+    aliases: [hguard, gsguard, obsidianguard]
+    usage: /hardnessguard <status|check|list|setrule|removerule|setblock|removeblock|reload>
+    permission: hardnessguard.admin
 permissions:
-  obsidianguard.admin:
-    description: Permite gerenciar o SurvivalzaoObsidianGuard
+  hardnessguard.admin:
+    description: Permite gerenciar o GS-HardnessGuardSet
     default: op
+  hardnessguard.bypass:
+    description: Ignora modificadores de dureza quando settings.use-bypass-permission estiver true
+    default: false

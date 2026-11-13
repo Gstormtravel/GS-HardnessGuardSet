@@ -1,11 +1,10 @@
-package br.com.survivalzao.obsidianguard;
+package br.com.survivalzao.hardnessguard;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,51 +21,56 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Escuta acoes de mineracao para reduzir em 95% a velocidade de quebra de
- * obsidiana natural ou de geradores com lava/redstone sem afetar KGenerators.
+ * Escuta eventos de mineracao e aplica/remove o AttributeModifier em
+ * BLOCK_BREAK_SPEED dinamicamente conforme a regra do bloco e sua origem.
  */
-public final class ObsidianHardnessListener implements Listener {
+public final class HardnessListener implements Listener {
 
-    private final ObsidianGuardPlugin plugin;
+    private final HardnessGuardPlugin plugin;
     private final Map<UUID, Long> lastWarningMs = new ConcurrentHashMap<>();
     private final Set<UUID> activelyDamaging = ConcurrentHashMap.newKeySet();
 
-    public ObsidianHardnessListener(ObsidianGuardPlugin plugin) {
+    public HardnessListener(HardnessGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
     private void evaluateBlockForPlayer(Player player, Block block, boolean fromDamageEvent, boolean showWarning) {
         UUID uuid = player.getUniqueId();
-        GameMode mode = player.getGameMode();
-        if (mode == GameMode.CREATIVE || mode == GameMode.SPECTATOR) {
+        if (block == null || plugin.isExemptPlayer(player)) {
             activelyDamaging.remove(uuid);
-            plugin.removePenalty(player);
+            plugin.removeModifier(player);
             return;
         }
-        if (plugin.isHardenedObsidian(block)) {
-            if (fromDamageEvent) {
-                activelyDamaging.add(uuid);
-            }
-            plugin.applyPenalty(player);
-            if (!fromDamageEvent) {
-                // Caso o clique nao evolua para mineracao continua (BlockDamageEvent), limpa apos 2 ticks
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    if (player.isOnline() && !activelyDamaging.contains(uuid)) {
-                        plugin.removePenalty(player);
-                    }
-                }, 2L);
-            }
-            if (showWarning) {
-                long now = System.currentTimeMillis();
-                long prev = lastWarningMs.getOrDefault(uuid, 0L);
-                if (now - prev >= plugin.getActionbarCooldownMs()) {
-                    lastWarningMs.put(uuid, now);
-                    plugin.sendActionBar(player);
-                }
-            }
-        } else {
+
+        BlockHardnessRule rule = plugin.getMatchingRule(block);
+        if (rule == null) {
             activelyDamaging.remove(uuid);
-            plugin.removePenalty(player);
+            plugin.removeModifier(player);
+            return;
+        }
+
+        if (fromDamageEvent) {
+            activelyDamaging.add(uuid);
+        }
+
+        plugin.applyModifier(player, rule.getSpeedModifier());
+
+        if (!fromDamageEvent) {
+            // Caso um clique unico nao evolua para BlockDamageEvent continuo, limpa em 2 ticks
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (player.isOnline() && !activelyDamaging.contains(uuid)) {
+                    plugin.removeModifier(player);
+                }
+            }, 2L);
+        }
+
+        if (showWarning && rule.isActionbarWarning() && !rule.getActionbarMessage().isEmpty()) {
+            long now = System.currentTimeMillis();
+            long prev = lastWarningMs.getOrDefault(uuid, 0L);
+            if (now - prev >= plugin.getActionbarCooldownMs()) {
+                lastWarningMs.put(uuid, now);
+                plugin.sendActionBar(player, rule.getActionbarMessage());
+            }
         }
     }
 
@@ -77,7 +81,7 @@ public final class ObsidianHardnessListener implements Listener {
             evaluateBlockForPlayer(event.getPlayer(), event.getClickedBlock(), false, true);
         } else if (action == Action.LEFT_CLICK_AIR) {
             activelyDamaging.remove(event.getPlayer().getUniqueId());
-            plugin.removePenalty(event.getPlayer());
+            plugin.removeModifier(event.getPlayer());
         }
     }
 
@@ -89,33 +93,33 @@ public final class ObsidianHardnessListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockDamageAbort(BlockDamageAbortEvent event) {
         activelyDamaging.remove(event.getPlayer().getUniqueId());
-        plugin.removePenalty(event.getPlayer());
+        plugin.removeModifier(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBreak(BlockBreakEvent event) {
         activelyDamaging.remove(event.getPlayer().getUniqueId());
-        plugin.removePenalty(event.getPlayer());
+        plugin.removeModifier(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHotbarChange(PlayerItemHeldEvent event) {
         activelyDamaging.remove(event.getPlayer().getUniqueId());
-        plugin.removePenalty(event.getPlayer());
+        plugin.removeModifier(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
-        if (event.getNewGameMode() == GameMode.CREATIVE || event.getNewGameMode() == GameMode.SPECTATOR) {
+        if (plugin.isExemptGamemode(event.getNewGameMode())) {
             activelyDamaging.remove(event.getPlayer().getUniqueId());
-            plugin.removePenalty(event.getPlayer());
+            plugin.removeModifier(event.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
         activelyDamaging.remove(event.getPlayer().getUniqueId());
-        plugin.removePenalty(event.getPlayer());
+        plugin.removeModifier(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -123,6 +127,6 @@ public final class ObsidianHardnessListener implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
         activelyDamaging.remove(uuid);
         lastWarningMs.remove(uuid);
-        plugin.removePenalty(event.getPlayer());
+        plugin.removeModifier(event.getPlayer());
     }
 }

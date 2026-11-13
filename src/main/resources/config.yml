@@ -1,8 +1,49 @@
-# Reducao aplicada no atributo BLOCK_BREAK_SPEED em obsidiana fora do KGenerators
-# -0.95 = apenas 5% da velocidade original (20x mais tempo para quebrar / 95% mais dificil)
-speed-penalty: -0.95
+# ==============================================================================
+# GS-HardnessGuardSet - Configuracao de Dureza e Velocidade de Quebra
+# ==============================================================================
+# Qualquer bloco do Minecraft NAO listado na secao 'blocks:' abaixo continuara
+# funcionando exatamente da forma padrao (vanilla), sem nenhum impacto no TPS.
+#
+# TIPOS DE GERACAO SUPORTADOS EM 'generations' (use um ou varios na lista):
+#   - NATURAL_GEN         : Blocos naturais do mundo, cavernas, estruturas, portais, etc.
+#   - KGEN_GEN            : Blocos gerados dentro de geradores do plugin KGenerators.
+#   - LAVA_GENERATOR_GEN  : Blocos gerados por lava + agua/redstone (alias: LAVA-GENERATOR_GEN).
+#   - PLAYER_PLACED       : Blocos colocados manualmente por jogadores.
+#   - ALL                 : Aplica em TODAS as origens acima sem distincao.
+#
+# VALORES DE 'speed-modifier' (Modificador no atributo BLOCK_BREAK_SPEED):
+#   - Negativos (-0.99 a -0.01): DEIXA MAIS DIFICIL (mais lento para quebrar).
+#       Ex.: -0.95 = 95% mais lento (5% da velocidade / 20x mais demorado)
+#       Ex.: -0.50 = 50% mais lento (50% da velocidade / 2x mais demorado)
+#   - Positivos (+0.01 a +10.0): DEIXA MAIS FACIL (mais rapido para quebrar).
+#       Ex.: +0.50 = 50% mais rapido
+#       Ex.: +1.00 = 2x mais rapido (metade do tempo)
+#
+# Tambem e possivel configurar/alterar regras pelo chat do servidor com:
+#   /hardnessguard setrule <BLOCO> <SPEED-MODIFIER> <GENERATIONS> [true/false] [actionbar true/false] [MENSAGEM]
+# ==============================================================================
 
-# Aviso na actionbar ao minerar obsidiana natural ou de gerador de redstone
-actionbar-warning: true
-actionbar-message: "&c⛏ Obsidiana Natural/Redstone: &e95% mais resistente &7(use Gerador KGenerators)"
-actionbar-cooldown-ms: 5000
+settings:
+  # Modos de jogo ignorados pelo plugin (recomendado manter CREATIVE e SPECTATOR)
+  exempt-gamemodes:
+    - CREATIVE
+    - SPECTATOR
+  # Se true, jogadores com a permissao 'hardnessguard.bypass' nao sofrem modificadores
+  use-bypass-permission: false
+  # Tempo minimo (em ms) entre avisos na actionbar para o mesmo jogador
+  actionbar-cooldown-ms: 5000
+  # Rastrear movimento de blocos por pistao para evitar burla de LAVA_GENERATOR_GEN/PLAYER_PLACED
+  track-pistons: true
+  # Logs detalhados no console para diagnostico
+  debug: false
+
+blocks:
+  OBSIDIAN:
+    enabled: true
+    speed-modifier: -0.95
+    generations:
+      - NATURAL_GEN
+      - LAVA-GENERATOR_GEN
+      - PLAYER_PLACED
+    actionbar-warning: true
+    actionbar-message: "&c⛏ Obsidiana protegida: &e95% mais resistente &7(use Gerador KGenerators)"
