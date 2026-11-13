@@ -1,0 +1,15 @@
+name: SurvivalzaoObsidianGuard
+version: 1.0.0
+main: br.com.survivalzao.obsidianguard.ObsidianGuardPlugin
+api-version: '1.21'
+softdepend: [KGenerators]
+description: Torna obsidiana natural ou de geradores de redstone 95% mais dificil de quebrar mantendo geradores do KGenerators normais.
+commands:
+  obsidianguard:
+    description: Gerencia e verifica a protecao de obsidiana natural e de redstone
+    usage: /obsidianguard <status|check|reload>
+    permission: obsidianguard.admin
+permissions:
+  obsidianguard.admin:
+    description: Permite gerenciar o SurvivalzaoObsidianGuard
+    default: op

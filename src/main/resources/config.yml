@@ -1,0 +1,8 @@
+# Reducao aplicada no atributo BLOCK_BREAK_SPEED em obsidiana fora do KGenerators
+# -0.95 = apenas 5% da velocidade original (20x mais tempo para quebrar / 95% mais dificil)
+speed-penalty: -0.95
+
+# Aviso na actionbar ao minerar obsidiana natural ou de gerador de redstone
+actionbar-warning: true
+actionbar-message: "&c⛏ Obsidiana Natural/Redstone: &e95% mais resistente &7(use Gerador KGenerators)"
+actionbar-cooldown-ms: 5000
