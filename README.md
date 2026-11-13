@@ -45,7 +45,9 @@ Plugin leve para **Paper / Purpur `1.21+` (incluindo `26.3`)** que permite confi
 
 O `GS-HardnessGuardSet` aplica um modificador transitório no atributo nativo `Attribute.BLOCK_BREAK_SPEED` (`MULTIPLY_SCALAR_1`) enquanto o jogador está minerando um bloco que corresponda à regra configurada — removendo o modificador automaticamente ao soltar o clique, quebrar o bloco, trocar de slot, mudar de gamemode ou desconectar.
 
-$$\text{Velocidade Final} = 1.0 + \text{speed-modifier}$$
+<div align="center">
+  <img src="assets/formula_speed.png" alt="Velocidade Final = 1.0 + speed-modifier" width="680" />
+</div>
 
 | `speed-modifier` | Velocidade Resultante | Tempo para Quebrar (vs. Vanilla) | Uso Típico |
 | :--- | :--- | :--- | :--- |
