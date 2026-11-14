@@ -11,7 +11,7 @@
 **Controle granular de dureza e velocidade de quebra de qualquer bloco do Minecraft por tipo de geração.**
 
 [![Versão](https://img.shields.io/badge/Versão-2.0.1-7C3AED?style=for-the-badge)](https://github.com/Gstormtravel/GS-HardnessGuardSet/releases/tag/v2.0.1)
-[![Modrinth](https://img.shields.io/badge/Modrinth-gs--hardnessguardset-1BD96A?style=for-the-badge&logo=modrinth)](https://modrinth.com/project/gs-hardnessguardset)
+[![Modrinth](https://img.shields.io/badge/Modrinth-gs--hardnessguardset-1BD96A?style=for-the-badge&logo=modrinth)](https://modrinth.com/plugin/gs-hardnessguardset)
 [![Paper / Purpur](https://img.shields.io/badge/Paper%20%2F%20Purpur-1.21%2B%20%7C%2026.3-10B981?style=for-the-badge)](https://papermc.io/)
 [![Java](https://img.shields.io/badge/Java-21%2B-EA580C?style=for-the-badge)](https://adoptium.net/)
 [![Reddit](https://img.shields.io/badge/Reddit-r%2FGSHardnessGuardSet-FF4500?style=for-the-badge)](https://www.reddit.com/r/GSHardnessGuardSet/)
